@@ -1,37 +1,2232 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>我的网站</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xhaoy的小破站 - 刷机资源平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #4bb543;
+            --warning: #ff9e00;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        /* 加载界面 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loading-logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 30px;
             text-align: center;
-            padding: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .loading-logo .xhaoy {
             color: white;
+            background: linear-gradient(90deg, #4361ee, #3a0ca3, #7209b7, #4361ee);
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 2s ease infinite;
+            padding: 0 5px;
+            border-radius: 5px;
         }
-        h1 {
-            font-size: 3em;
-            margin: 20px 0;
+        
+        .loading-logo .site {
+            color: var(--primary);
         }
-        .success {
+        
+        .loading-animation {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .loading-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-circle:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border-top: 3px solid var(--accent);
+            animation: spin 1.2s linear infinite reverse;
+        }
+        
+        .loading-circle:nth-child(3) {
+            width: 40%;
+            height: 40%;
+            top: 30%;
+            left: 30%;
+            border-top: 3px solid var(--success);
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1rem;
+            margin-top: 10px;
+            opacity: 0.8;
+            animation: fadeInOut 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.5s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* 优化后的灵动岛样式 */
+        .dynamic-island-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 基础灵动岛样式 */
+        .dynamic-island {
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dynamic-island:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.05);
+        }
+        
+        /* 主岛 - 祝福语岛 */
+        .blessing-island {
+            width: 140px;
+            height: 40px;
+            z-index: 102;
+        }
+        
+        .blessing-island.expanded {
+            width: 300px;
+            height: 70px;
+            border-radius: 35px;
+        }
+        
+        /* 音乐控制岛 */
+        .music-island {
+            width: 140px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 25px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 101;
+            transform: translateY(-20px) scale(0.9);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s;
+        }
+        
+        .music-island.active {
+            display: flex;
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .music-island.expanded {
+            width: 360px;
+            height: 70px;
+            border-radius: 35px;
+        }
+        
+        .island-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .island-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .island-text {
+            white-space: nowrap;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.3;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .blessing-text {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease 0.2s;
+        }
+        
+        .blessing-island.expanded .blessing-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 音乐控制区域 */
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .music-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .music-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        /* 音量控制区域 */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            max-width: 160px;
+        }
+        
+        .volume-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .volume-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .volume-slider-container {
+            position: relative;
+            flex: 1;
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
             background: rgba(255,255,255,0.2);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .volume-slider:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* 音乐波动条 */
+        .music-visualizer {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 20px;
+        }
+        
+        .music-bar {
+            width: 3px;
+            height: 12px;
+            background: linear-gradient(180deg, var(--accent), var(--primary));
+            border-radius: 2px;
+            animation: musicWave 1.5s ease-in-out infinite;
+            transform-origin: bottom;
+        }
+        
+        .music-bar:nth-child(1) { animation-delay: 0s; height: 8px; }
+        .music-bar:nth-child(2) { animation-delay: 0.1s; height: 12px; }
+        .music-bar:nth-child(3) { animation-delay: 0.2s; height: 16px; }
+        .music-bar:nth-child(4) { animation-delay: 0.3s; height: 12px; }
+        .music-bar:nth-child(5) { animation-delay: 0.4s; height: 8px; }
+        
+        @keyframes musicWave {
+            0%, 100% { transform: scaleY(0.3); opacity: 0.6; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+        
+        /* 圆形图片样式 */
+        .island-avatar {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: rotateSlow 12s linear infinite;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .island-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .blessing-island.expanded .island-avatar {
+            opacity: 0;
+            transform: scale(0.3) rotate(180deg);
+        }
+        
+        @keyframes rotateSlow {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* 流光溢彩效果 */
+        .marquee-container {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            border-radius: 27px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .marquee-track {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 27px;
+            animation: marquee-rotate 4s linear infinite;
+        }
+        
+        .marquee-light {
+            position: absolute;
+            width: 30px;
+            height: 8px;
+            border-radius: 4px;
+            filter: blur(1px);
+            animation: marquee-color 3s linear infinite;
+            box-shadow: 0 0 20px currentColor;
+            opacity: 0.8;
+        }
+        
+        .marquee-light:nth-child(1) {
+            top: 0;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .marquee-light:nth-child(2) {
+            top: 0;
+            right: 10%;
+            animation-delay: 0.5s;
+        }
+        
+        .marquee-light:nth-child(3) {
+            bottom: 0;
+            right: 20%;
+            animation-delay: 1s;
+        }
+        
+        .marquee-light:nth-child(4) {
+            bottom: 0;
+            left: 20%;
+            animation-delay: 1.5s;
+        }
+        
+        .marquee-light:nth-child(5) {
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            animation-delay: 2s;
+        }
+        
+        .marquee-light:nth-child(6) {
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            animation-delay: 2.5s;
+        }
+        
+        @keyframes marquee-rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes marquee-color {
+            0% {
+                background: #ff0080;
+                color: #ff0080;
+            }
+            16.6% {
+                background: #ff8c00;
+                color: #ff8c00;
+            }
+            33.3% {
+                background: #40e0d0;
+                color: #40e0d0;
+            }
+            50% {
+                background: #9b30ff;
+                color: #9b30ff;
+            }
+            66.6% {
+                background: #00ff00;
+                color: #00ff00;
+            }
+            83.3% {
+                background: #ffff00;
+                color: #ffff00;
+            }
+            100% {
+                background: #ff0080;
+                color: #ff0080;
+            }
+        }
+        
+        /* 展开时流光调整 */
+        .dynamic-island.expanded .marquee-container {
+            top: -3px;
+            left: -3px;
+            width: calc(100% + 6px);
+            height: calc(100% + 6px);
+            border-radius: 38px;
+        }
+        
+        /* 其他原有CSS保持不变 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            margin-top: 100px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            display: inline-block;
+        }
+        
+        .title-xhaoy {
+            color: white;
+            background: linear-gradient(90deg, #4361ee, #3a0ca3, #7209b7, #4361ee);
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s ease infinite;
+            padding: 0 5px;
+            border-radius: 5px;
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .title-site {
+            color: var(--primary);
+            position: relative;
+        }
+        
+        .title-site::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: right;
+            animation: underline 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes underline {
+            0% { transform: scaleX(0); transform-origin: right; }
+            50% { transform: scaleX(1); transform-origin: right; }
+            51% { transform-origin: left; }
+            100% { transform: scaleX(0); transform-origin: left; }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .subtitle::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            animation: subtitleLine 4s ease-in-out infinite;
+        }
+        
+        @keyframes subtitleLine {
+            0% { left: -100%; }
+            50% { left: 0; }
+            100% { left: 100%; }
+        }
+        
+        .resources-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .resource-category {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resource-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .resource-category:hover::before {
+            left: 100%;
+        }
+        
+        .resource-category:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .category-header {
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .roms .category-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .tools .category-header {
+            background: linear-gradient(135deg, var(--warning), #ff6b00);
+        }
+        
+        .modules .category-header {
+            background: linear-gradient(135deg, var(--success), #2e7d32);
+        }
+        
+        .category-icon {
+            font-size: 2.2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .category-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .resource-list {
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .resource-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resource-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .resource-item:hover::before {
+            left: 100%;
+        }
+        
+        .resource-item:hover {
+            background: var(--light);
+            border-color: rgba(0,0,0,0.05);
+            transform: translateX(5px);
+        }
+        
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            border-radius: 10px;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .roms .resource-icon {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+        
+        .tools .resource-icon {
+            color: var(--warning);
+            background: rgba(255, 158, 0, 0.1);
+        }
+        
+        .modules .resource-icon {
+            color: var(--success);
+            background: rgba(75, 181, 67, 0.1);
+        }
+        
+        .resource-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .resource-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .resource-meta {
+            display: flex;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .resource-meta span {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .category-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .download-all-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .download-all-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .download-all-btn:hover::before {
+            left: 100%;
+        }
+        
+        .download-all-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .roms .download-all-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .tools .download-all-btn {
+            background: linear-gradient(135deg, var(--warning), #ff6b00);
+        }
+        
+        .modules .download-all-btn {
+            background: linear-gradient(135deg, var(--success), #2e7d32);
+        }
+        
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            animation: statPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes statPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* 开发者模式样式 */
+        .developer-mode {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            color: white;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .developer-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .developer-content {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(67, 97, 238, 0.5);
+            border: 1px solid rgba(67, 97, 238, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .developer-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+        
+        .developer-header h2 {
+            color: white;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .developer-header p {
+            color: #aaa;
+        }
+        
+        .developer-section {
+            margin-bottom: 30px;
+        }
+        
+        .developer-section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+        
+        .developer-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .feature-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .feature-item:hover {
+            background: rgba(67, 97, 238, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(67, 97, 238, 0.5);
+        }
+        
+        .feature-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .close-dev {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .close-dev:hover {
+            background: #c1121f;
+            transform: scale(1.1);
+        }
+        
+        /* 统计数据编辑区域 */
+        .stats-editor {
+            background: rgba(255,255,255,0.05);
             padding: 20px;
             border-radius: 10px;
-            margin: 20px auto;
-            max-width: 500px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        
+        .stat-control:last-child {
+            margin-bottom: 0;
+        }
+        
+        .stat-control label {
+            color: white;
+            font-weight: 500;
+            min-width: 100px;
+        }
+        
+        .stat-control input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 5px;
+            padding: 8px 12px;
+            color: white;
+            width: 120px;
+            text-align: center;
+        }
+        
+        .stat-control input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.3);
+        }
+        
+        .update-stats-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .update-stats-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        /* 点击计数器 */
+        .click-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 999;
+        }
+        
+        @media (max-width: 1024px) {
+            .resources-section {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .resources-section {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .resource-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .resource-meta span {
+                margin-right: 0;
+            }
+            
+            .developer-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .music-island.expanded {
+                width: 320px;
+            }
+            
+            .blessing-island.expanded {
+                width: 280px;
+            }
+            
+            .stat-control {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .stat-control input {
+                width: 100%;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .resource-category {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .roms {
+            animation-delay: 0.1s;
+        }
+        
+        .tools {
+            animation-delay: 0.2s;
+        }
+        
+        .modules {
+            animation-delay: 0.3s;
+        }
+        
+        /* 点击计数动画 */
+        .count-up {
+            animation: countUp 0.5s ease;
+        }
+        
+        @keyframes countUp {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: var(--success); }
+            100% { transform: scale(1); color: var(--primary); }
+        }
+        
+        /* 标题点击效果 */
+        .title-clicked {
+            animation: titleClick 0.3s ease;
+        }
+        
+        @keyframes titleClick {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 浮动背景元素 */
+        .floating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); }
+            25% { transform: translateY(-20px) translateX(20px) rotate(90deg); }
+            50% { transform: translateY(0) translateX(40px) rotate(180deg); }
+            75% { transform: translateY(20px) translateX(20px) rotate(270deg); }
+            100% { transform: translateY(0) translateX(0) rotate(360deg); }
+        }
+
+        /* 下载按钮动画 */
+        .download-clicked {
+            animation: downloadPulse 0.6s ease;
+        }
+
+        @keyframes downloadPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); box-shadow: 0 0 0 10px rgba(67, 97, 238, 0.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* 同步状态提示 */
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: none;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+        }
+
+        .sync-status.show {
+            display: block;
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
-    <h1>✅ 网站正常运行！</h1>
-    <div class="success">
-        <p>恭喜！你的 GitHub Pages 已成功部署</p>
-        <p>当前时间：<span id="time"></span></p>
+    <!-- 加载界面 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-animation">
+            <div class="loading-circle"></div>
+            <div class="loading-circle"></div>
+            <div class="loading-circle"></div>
+        </div>
+        <div class="loading-logo">
+            <span class="xhaoy">xhaoy</span>
+            <span class="site">的小破站</span>
+        </div>
+        <div class="loading-text">正在加载资源...</div>
     </div>
     
+    <!-- 优化后的灵动岛 -->
+    <div class="dynamic-island-container">
+        <!-- 音乐控制岛 -->
+        <div class="dynamic-island music-island" id="musicIsland">
+            <div class="marquee-container">
+                <div class="marquee-track">
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                </div>
+            </div>
+            
+            <div class="music-controls">
+                <!-- 音乐波动条 -->
+                <div class="music-visualizer">
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                </div>
+                
+                <!-- 音乐控制按钮 -->
+                <button class="music-btn" id="prevMusic" title="上一首">
+                    <i class="fas fa-backward"></i>
+                </button>
+                <button class="music-btn" id="playPauseMusic" title="播放/暂停">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="music-btn" id="nextMusic" title="下一首">
+                    <i class="fas fa-forward"></i>
+                </button>
+                
+                <!-- 音量控制 -->
+                <div class="volume-control">
+                    <button class="volume-btn" id="volumeIcon" title="音量">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <div class="volume-slider-container">
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 祝福语岛 -->
+        <div class="dynamic-island blessing-island" id="blessingIsland">
+            <div class="marquee-container">
+                <div class="marquee-track">
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                    <div class="marquee-light"></div>
+                </div>
+            </div>
+            
+            <div class="island-content">
+                <div class="island-left">
+                    <!-- 圆形图片 -->
+                    <div class="island-avatar">
+                        <img src="https://img11.360buyimg.com/ddimg/jfs/t1/353655/8/18167/33870/6925e499Fe6bf6453/b71c2346052908bd.jpg" alt="头像">
+                    </div>
+                    
+                    <!-- 祝福语 -->
+                    <div class="island-text">
+                        <span class="blessing-text"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 同步状态提示 -->
+    <div class="sync-status" id="syncStatus"></div>
+    
+    <!-- 浮动背景元素 -->
+    <div class="floating-bg">
+        <div class="floating-element" style="width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s;"></div>
+        <div class="floating-element" style="width: 150px; height: 150px; top: 60%; left: 80%; animation-delay: -5s;"></div>
+        <div class="floating-element" style="width: 80px; height: 80px; top: 80%; left: 20%; animation-delay: -10s;"></div>
+        <div class="floating-element" style="width: 120px; height: 120px; top: 30%; left: 70%; animation-delay: -7s;"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1 id="mainTitle">
+                <span class="title-xhaoy">xhaoy</span>
+                <span class="title-site">的小破站</span>
+            </h1>
+            <p class="subtitle">精选刷机资源，安全可靠，持续更新，为您的设备提供最佳体验</p>
+        </header>
+        
+        <div class="resources-section">
+            <!-- 刷机包板块 -->
+            <div class="resource-category roms">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div>
+                        <div class="category-title">刷机包</div>
+                        <div class="category-description">官方及第三方ROM，支持多种设备</div>
+                    </div>
+                </div>
+                
+                <div class="resource-list">
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fab fa-android"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">小米6 ColorOS16</div>
+                            <div class="resource-meta">
+                                <span><i class="far fa-calendar"></i> 2023-11-20</span>
+                                <span><i class="far fa-hdd"></i> 2.8 GB</span>
+                                <span><i class="fas fa-download"></i> 3.5K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-mobile"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">小米11 澎湃3.0</div>
+                            <div class="resource-meta">
+                                <span><i class="far fa-calendar"></i> 2023-11-15</span>
+                                <span><i class="far fa-hdd"></i> 3.2 GB</span>
+                                <span><i class="fas fa-download"></i> 4.8K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">更多刷机包请前往不限速网盘查看</div>
+                            <div class="resource-meta">
+                                <span><i class="fas fa-external-link-alt"></i> 持续更新</span>
+                                <span><i class="fas fa-archive"></i> 100+ ROM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-footer">
+                    <button class="download-all-btn" id="romsDownloadBtn">
+                        <i class="fas fa-cloud-download-alt"></i> 前往下载刷机包
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 刷机工具板块 -->
+            <div class="resource-category tools">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div>
+                        <div class="category-title">刷机工具</div>
+                        <div class="category-description">专业工具，安全高效完成刷机</div>
+                    </div>
+                </div>
+                
+                <div class="resource-list">
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">搞机助手</div>
+                            <div class="resource-meta">
+                                <span><i class="far fa-calendar"></i> 2023-10-25</span>
+                                <span><i class="far fa-hdd"></i> 68 MB</span>
+                                <span><i class="fas fa-download"></i> 12.8K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">高通工具箱</div>
+                            <div class="resource-meta">
+                                <span><i class="far fa-calendar"></i> 2023-11-05</span>
+                                <span><i class="far fa-hdd"></i> 42 MB</span>
+                                <span><i class="fas fa-download"></i> 8.3K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">更多工具请前往不限速网盘查看</div>
+                            <div class="resource-meta">
+                                <span><i class="fas fa-external-link-alt"></i> 持续更新</span>
+                                <span><i class="fas fa-tools"></i> 50+ 工具</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-footer">
+                    <button class="download-all-btn" id="toolsDownloadBtn">
+                        <i class="fas fa-cloud-download-alt"></i> 前往下载刷机工具
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 面具模块板块 -->
+            <div class="resource-category modules">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <div>
+                        <div class="category-title">面具模块</div>
+                        <div class="category-description">功能扩展模块，增强系统能力</div>
+                    </div>
+                </div>
+                
+                <div class="resource-list">
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-volume-mute"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">音量键触发禁用所有模块</div>
+                            <div class="resource-meta">
+                                <span><i class="far fa-calendar"></i> 2023-11-12</span>
+                                <span><i class="far fa-hdd"></i> 1.2 MB</span>
+                                <span><i class="fas fa-download"></i> 15.6K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">yc调度</div>
+                            <div class="resource-meta">
+                                <span><i class="far fa-calendar"></i> 2023-11-08</span>
+                                <span><i class="far fa-hdd"></i> 2.8 MB</span>
+                                <span><i class="fas fa-download"></i> 11.2K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-item">
+                        <div class="resource-icon">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </div>
+                        <div class="resource-info">
+                            <div class="resource-name">更多模块请前往不限速网盘查看</div>
+                            <div class="resource-meta">
+                                <span><i class="fas fa-external-link-alt"></i> 持续更新</span>
+                                <span><i class="fas fa-puzzle-piece"></i> 80+ 模块</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-footer">
+                    <button class="download-all-btn" id="modulesDownloadBtn">
+                        <i class="fas fa-cloud-download-alt"></i> 前往下载面具模块
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="stat-number" id="totalDownloads">0</div>
+                <div class="stat-label">总下载量</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-archive"></i>
+                </div>
+                <div class="stat-number" id="totalResources">328</div>
+                <div class="stat-label">资源总数</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="stat-number" id="supportedDevices">42</div>
+                <div class="stat-label">支持设备</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" id="activeUsers">12.5K</div>
+                <div class="stat-label">活跃用户</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 点击计数器 -->
+    <div class="click-counter" id="clickCounter">点击: 0/10</div>
+    
+    <!-- 开发者模式 -->
+    <div class="developer-mode" id="developerMode">
+        <div class="developer-backdrop"></div>
+        <button class="close-dev" id="closeDev">×</button>
+        <div class="developer-content">
+            <div class="developer-header">
+                <h2>开发者控制台</h2>
+                <p>高级系统管理工具 - 所有设置将全局同步</p>
+            </div>
+            
+            <!-- 全局设置管理 -->
+            <div class="developer-section">
+                <h3>全局设置管理</h3>
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="color: var(--accent); margin-bottom: 15px; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> 所有设置将保存到本地存储，刷新页面后生效
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: white; margin-bottom: 8px;">网站标题:</div>
+                        <input type="text" id="siteTitle" value="xhaoy的小破站" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; margin-bottom: 10px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: white; margin-bottom: 8px;">网站描述:</div>
+                        <textarea id="siteDescription" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; margin-bottom: 10px; height: 60px; resize: vertical;">精选刷机资源，安全可靠，持续更新，为您的设备提供最佳体验</textarea>
+                    </div>
+                    
+                    <button id="saveGlobalSettings" style="background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%;">保存全局设置</button>
+                </div>
+            </div>
+            
+            <!-- 背景音乐管理 -->
+            <div class="developer-section">
+                <h3>背景音乐管理</h3>
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">当前状态: <span id="musicStatus">未设置</span></div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button id="toggleMusic" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">播放音乐</button>
+                            <button id="stopMusic" style="background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">停止音乐</button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: white; margin-bottom: 8px;">音乐链接:</div>
+                        <input type="text" id="musicUrl" value="http://music.163.com/song/media/outer/url?id=1480504807.mp3" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; margin-bottom: 10px;">
+                        <button id="saveMusic" style="background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%;">保存音乐设置</button>
+                    </div>
+                    
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                        <div style="color: white; margin-bottom: 8px;">音乐列表:</div>
+                        <div id="musicList" style="max-height: 150px; overflow-y: auto;">
+                            <!-- 音乐列表将通过JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 背景图片管理 -->
+            <div class="developer-section">
+                <h3>背景图片管理</h3>
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: white; margin-bottom: 8px;">背景图片URL:</div>
+                        <input type="text" id="bgImageUrl" placeholder="输入背景图片链接" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; margin-bottom: 10px;">
+                        <button id="setBgImage" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 10px;">设置背景图片</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: white; margin-bottom: 8px;">上传背景图:</div>
+                        <input type="file" id="bgUpload" accept="image/*" style="margin-bottom: 10px; color: white; width: 100%;">
+                        <button id="uploadBtn" style="background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%;">上传并设为背景</button>
+                    </div>
+                    
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                        <button id="resetBackground" style="background: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%;">恢复默认背景</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="developer-section">
+                <h3>统计数据管理</h3>
+                <div class="stats-editor">
+                    <div class="stat-control">
+                        <label for="editResources">资源总数:</label>
+                        <input type="number" id="editResources" value="328" min="0">
+                    </div>
+                    <div class="stat-control">
+                        <label for="editDevices">支持设备:</label>
+                        <input type="number" id="editDevices" value="42" min="0">
+                    </div>
+                    <div class="stat-control">
+                        <label for="editUsers">活跃用户:</label>
+                        <input type="text" id="editUsers" value="12.5K">
+                    </div>
+                    <button class="update-stats-btn" id="updateStatsBtn">更新统计数据</button>
+                </div>
+            </div>
+            
+            <div class="developer-section">
+                <h3>系统信息</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="color: var(--primary); font-weight: bold;">资源统计</div>
+                        <div style="margin-top: 10px;">
+                            <div>刷机包: 128</div>
+                            <div>工具: 56</div>
+                            <div>模块: 144</div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="color: var(--primary); font-weight: bold;">系统状态</div>
+                        <div style="margin-top: 10px;">
+                            <div>正常运行: 28天</div>
+                            <div>内存使用: 42%</div>
+                            <div>存储空间: 68%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.getElementById('time').textContent = new Date().toLocaleString();
+        // 页面加载完成后立即隐藏加载界面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化全局设置
+            initGlobalSettings();
+            
+            // 立即隐藏加载界面（模拟快速加载）
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.visibility = 'hidden';
+            }, 1200);
+            
+            // 从本地存储加载总下载量
+            const savedDownloads = localStorage.getItem('totalDownloads');
+            const totalDownloads = document.getElementById('totalDownloads');
+            
+            if (savedDownloads) {
+                totalDownloads.textContent = savedDownloads;
+            } else {
+                totalDownloads.textContent = '0';
+                localStorage.setItem('totalDownloads', '0');
+            }
+            
+            // 为资源项添加悬停效果
+            const resourceItems = document.querySelectorAll('.resource-item');
+            resourceItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(8px)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+            
+            // 下载并更新计数函数
+            function downloadFile(fileUrl, button) {
+                // 1. 读取本地已存计数（无则为0）
+                let count = parseInt(localStorage.getItem('totalDownloads')) || 0;
+                // 2. 计数+1并保存
+                count++;
+                localStorage.setItem('totalDownloads', count);
+                // 3. 刷新页面显示
+                document.getElementById('totalDownloads').innerText = count;
+                document.getElementById('totalDownloads').classList.add('count-up');
+                setTimeout(() => {
+                    document.getElementById('totalDownloads').classList.remove('count-up');
+                }, 500);
+                // 4. 触发文件下载
+                window.open(fileUrl, '_blank');
+                
+                // 添加点击动画效果
+                if (button) {
+                    button.classList.add('download-clicked');
+                    setTimeout(() => {
+                        button.classList.remove('download-clicked');
+                    }, 600);
+                }
+                
+                // 显示同步提示
+                showSyncStatus('下载计数已更新: ' + count);
+            }
+            
+            // 同步状态提示
+            function showSyncStatus(message) {
+                const syncStatus = document.getElementById('syncStatus');
+                syncStatus.textContent = message;
+                syncStatus.classList.add('show');
+                setTimeout(() => {
+                    syncStatus.classList.remove('show');
+                }, 3000);
+            }
+            
+            // 刷机包下载按钮点击事件
+            const romsDownloadBtn = document.getElementById('romsDownloadBtn');
+            romsDownloadBtn.addEventListener('click', function() {
+                downloadFile('https://www.123865.com/s/wqTojv-oiIpH', this);
+            });
+            
+            // 刷机工具下载按钮点击事件
+            const toolsDownloadBtn = document.getElementById('toolsDownloadBtn');
+            toolsDownloadBtn.addEventListener('click', function() {
+                downloadFile('https://www.123865.com/s/wqTojv-miIpH', this);
+            });
+            
+            // 面具模块下载按钮点击事件
+            const modulesDownloadBtn = document.getElementById('modulesDownloadBtn');
+            modulesDownloadBtn.addEventListener('click', function() {
+                downloadFile('https://www.123865.com/s/wqTojv-1iIpH', this);
+            });
+            
+            // 开发者模式激活逻辑
+            const mainTitle = document.getElementById('mainTitle');
+            const clickCounter = document.getElementById('clickCounter');
+            const developerMode = document.getElementById('developerMode');
+            const closeDev = document.getElementById('closeDev');
+            
+            let clickCount = 0;
+            let lastClickTime = 0;
+            
+            mainTitle.addEventListener('click', function() {
+                const currentTime = new Date().getTime();
+                if (currentTime - lastClickTime > 2000) {
+                    clickCount = 0;
+                }
+                clickCount++;
+                lastClickTime = currentTime;
+                clickCounter.style.display = 'block';
+                clickCounter.textContent = `点击: ${clickCount}/10`;
+                mainTitle.classList.add('title-clicked');
+                setTimeout(() => {
+                    mainTitle.classList.remove('title-clicked');
+                }, 300);
+                if (clickCount >= 10) {
+                    developerMode.style.display = 'block';
+                    clickCount = 0;
+                    clickCounter.style.display = 'none';
+                }
+                setTimeout(() => {
+                    if (clickCount < 10) {
+                        clickCounter.style.display = 'none';
+                    }
+                }, 2000);
+            });
+            
+            // 关闭开发者模式
+            closeDev.addEventListener('click', function() {
+                developerMode.style.display = 'none';
+            });
+            
+            // 优化后的灵动岛功能
+            const blessingIsland = document.getElementById('blessingIsland');
+            const musicIsland = document.getElementById('musicIsland');
+            const blessingText = document.querySelector('.blessing-text');
+            
+            // 祝福语数组
+            const blessings = [
+                "愿你刷机顺利，一路畅通无阻！",
+                "祝你的设备永远流畅如新！",
+                "愿你的每一次刷机都完美成功！",
+                "祝你找到最适合的ROM，体验最佳！",
+                "愿你的设备性能飙升，体验非凡！",
+                "祝你刷机无忧，快乐每一天！",
+                "愿你的手机永远不卡顿，永远流畅！",
+                "祝你找到心仪的模块，功能更强大！",
+                "愿你的刷机之路充满惊喜与收获！",
+                "祝你技术日益精进，玩机更快乐！",
+                "愿你的设备永远年轻，永远给力！",
+                "祝你刷机成功，享受极致体验！",
+                "愿你的每一次尝试都有美好结果！",
+                "祝你玩机愉快，收获满满！",
+                "愿你的设备永远保持最佳状态！"
+            ];
+            
+            let isExpanded = false;
+            
+            // 灵动岛点击事件
+            blessingIsland.addEventListener('click', function() {
+                if (!isExpanded) {
+                    // 展开状态
+                    const randomBlessing = blessings[Math.floor(Math.random() * blessings.length)];
+                    blessingText.textContent = randomBlessing;
+                    blessingIsland.classList.add('expanded');
+                    musicIsland.classList.add('active', 'expanded');
+                    isExpanded = true;
+                    
+                    // 5秒后自动收起
+                    setTimeout(() => {
+                        if (isExpanded) {
+                            blessingIsland.classList.remove('expanded');
+                            musicIsland.classList.remove('active', 'expanded');
+                            isExpanded = false;
+                        }
+                    }, 5000);
+                } else {
+                    // 收起状态
+                    blessingIsland.classList.remove('expanded');
+                    musicIsland.classList.remove('active', 'expanded');
+                    isExpanded = false;
+                }
+            });
+            
+            // 统计数据编辑功能
+            const editResources = document.getElementById('editResources');
+            const editDevices = document.getElementById('editDevices');
+            const editUsers = document.getElementById('editUsers');
+            const updateStatsBtn = document.getElementById('updateStatsBtn');
+            const totalResources = document.getElementById('totalResources');
+            const supportedDevices = document.getElementById('supportedDevices');
+            const activeUsers = document.getElementById('activeUsers');
+            
+            updateStatsBtn.addEventListener('click', function() {
+                totalResources.textContent = editResources.value;
+                supportedDevices.textContent = editDevices.value;
+                activeUsers.textContent = editUsers.value;
+                localStorage.setItem('totalResources', editResources.value);
+                localStorage.setItem('supportedDevices', editDevices.value);
+                localStorage.setItem('activeUsers', editUsers.value);
+                showSyncStatus('统计数据已更新！');
+            });
+            
+            // 从本地存储加载统计数据
+            const savedResources = localStorage.getItem('totalResources');
+            const savedDevices = localStorage.getItem('supportedDevices');
+            const savedUsers = localStorage.getItem('activeUsers');
+            
+            if (savedResources) {
+                totalResources.textContent = savedResources;
+                editResources.value = savedResources;
+            } else {
+                localStorage.setItem('totalResources', '328');
+            }
+            if (savedDevices) {
+                supportedDevices.textContent = savedDevices;
+                editDevices.value = savedDevices;
+            } else {
+                localStorage.setItem('supportedDevices', '42');
+            }
+            if (savedUsers) {
+                activeUsers.textContent = savedUsers;
+                editUsers.value = savedUsers;
+            } else {
+                localStorage.setItem('activeUsers', '12.5K');
+            }
+            
+            // 音乐控制功能
+            const bgMusic = new Audio();
+            let isPlaying = false;
+            let currentMusicIndex = 0;
+            
+            // 预置音乐列表
+            const musicList = [
+                {
+                    name: "推荐音乐",
+                    url: "http://music.163.com/song/media/outer/url?id=1480504807.mp3"
+                },
+                {
+                    name: "轻音乐1",
+                    url: "https://example.com/music1.mp3"
+                },
+                {
+                    name: "轻音乐2", 
+                    url: "https://example.com/music2.mp3"
+                }
+            ];
+            
+            // 音乐控制元素
+            const toggleMusic = document.getElementById('toggleMusic');
+            const stopMusic = document.getElementById('stopMusic');
+            const saveMusic = document.getElementById('saveMusic');
+            const musicUrl = document.getElementById('musicUrl');
+            const musicStatus = document.getElementById('musicStatus');
+            const musicListContainer = document.getElementById('musicList');
+            const playPauseBtn = document.getElementById('playPauseMusic');
+            const prevBtn = document.getElementById('prevMusic');
+            const nextBtn = document.getElementById('nextMusic');
+            const musicVisualizer = document.querySelector('.music-visualizer');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeIcon = document.getElementById('volumeIcon');
+            
+            // 音量控制
+            volumeSlider.addEventListener('input', function() {
+                const volume = this.value / 100;
+                bgMusic.volume = volume;
+                
+                // 更新音量图标
+                if (volume == 0) {
+                    volumeIcon.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else if (volume < 0.5) {
+                    volumeIcon.innerHTML = '<i class="fas fa-volume-down"></i>';
+                } else {
+                    volumeIcon.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+            
+            // 初始化音量
+            volumeSlider.value = 50;
+            bgMusic.volume = 0.5;
+            
+            // 初始化音乐列表
+            function initMusicList() {
+                musicListContainer.innerHTML = '';
+                musicList.forEach((music, index) => {
+                    const musicItem = document.createElement('div');
+                    musicItem.style.padding = '8px';
+                    musicItem.style.marginBottom = '5px';
+                    musicItem.style.background = index === currentMusicIndex ? 'rgba(67, 97, 238, 0.3)' : 'rgba(255,255,255,0.05)';
+                    musicItem.style.borderRadius = '5px';
+                    musicItem.style.cursor = 'pointer';
+                    musicItem.style.display = 'flex';
+                    musicItem.style.justifyContent = 'space-between';
+                    musicItem.style.alignItems = 'center';
+                    musicItem.innerHTML = `
+                        <span>${music.name}</span>
+                        <button onclick="playMusic(${index})" style="background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 0.8rem;">播放</button>
+                    `;
+                    musicListContainer.appendChild(musicItem);
+                });
+            }
+            
+            // 播放音乐函数
+            window.playMusic = function(index) {
+                currentMusicIndex = index;
+                bgMusic.src = musicList[index].url;
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    musicStatus.textContent = `正在播放: ${musicList[index].name}`;
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    musicVisualizer.style.display = 'flex';
+                    initMusicList();
+                    showSyncStatus(`开始播放: ${musicList[index].name}`);
+                }).catch(error => {
+                    console.error('播放失败:', error);
+                    musicStatus.textContent = '播放失败，请检查音乐链接';
+                    showSyncStatus('音乐播放失败');
+                });
+            };
+            
+            // 播放/暂停音乐
+            toggleMusic.addEventListener('click', function() {
+                if (!isPlaying) {
+                    playMusic(currentMusicIndex);
+                } else {
+                    bgMusic.pause();
+                    isPlaying = false;
+                    musicStatus.textContent = '已暂停';
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    musicVisualizer.style.display = 'none';
+                    showSyncStatus('音乐已暂停');
+                }
+            });
+            
+            // 灵动岛播放/暂停
+            playPauseBtn.addEventListener('click', function() {
+                if (!isPlaying) {
+                    playMusic(currentMusicIndex);
+                } else {
+                    bgMusic.pause();
+                    isPlaying = false;
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    musicVisualizer.style.display = 'none';
+                }
+            });
+            
+            // 停止音乐
+            stopMusic.addEventListener('click', function() {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                isPlaying = false;
+                musicStatus.textContent = '已停止';
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                musicVisualizer.style.display = 'none';
+                showSyncStatus('音乐已停止');
+            });
+            
+            // 上一首
+            prevBtn.addEventListener('click', function() {
+                currentMusicIndex = (currentMusicIndex - 1 + musicList.length) % musicList.length;
+                playMusic(currentMusicIndex);
+            });
+            
+            // 下一首
+            nextBtn.addEventListener('click', function() {
+                currentMusicIndex = (currentMusicIndex + 1) % musicList.length;
+                playMusic(currentMusicIndex);
+            });
+            
+            // 保存音乐设置
+            saveMusic.addEventListener('click', function() {
+                const url = musicUrl.value.trim();
+                if (url) {
+                    musicList[0].url = url;
+                    localStorage.setItem('customMusic', url);
+                    showSyncStatus('音乐设置已保存！');
+                    if (isPlaying) {
+                        playMusic(currentMusicIndex);
+                    }
+                }
+            });
+            
+            // 从本地存储加载自定义音乐
+            const savedMusic = localStorage.getItem('customMusic');
+            if (savedMusic) {
+                musicUrl.value = savedMusic;
+                musicList[0].url = savedMusic;
+            }
+            
+            // 初始化音乐列表
+            initMusicList();
+            
+            // 音乐播放结束自动下一首
+            bgMusic.addEventListener('ended', function() {
+                currentMusicIndex = (currentMusicIndex + 1) % musicList.length;
+                playMusic(currentMusicIndex);
+            });
+            
+            // 背景图片管理
+            const bgImageUrl = document.getElementById('bgImageUrl');
+            const setBgImage = document.getElementById('setBgImage');
+            const bgUpload = document.getElementById('bgUpload');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const resetBackground = document.getElementById('resetBackground');
+            
+            // 设置背景图片URL
+            setBgImage.addEventListener('click', function() {
+                const url = bgImageUrl.value.trim();
+                if (url) {
+                    localStorage.setItem('customBackground', url);
+                    document.body.style.backgroundImage = `url(${url})`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundAttachment = 'fixed';
+                    showSyncStatus('背景图片已设置！');
+                }
+            });
+            
+            // 上传背景图片
+            uploadBtn.addEventListener('click', function() {
+                const file = bgUpload.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageUrl = e.target.result;
+                        localStorage.setItem('customBackground', imageUrl);
+                        document.body.style.backgroundImage = `url(${imageUrl})`;
+                        document.body.style.backgroundSize = 'cover';
+                        document.body.style.backgroundAttachment = 'fixed';
+                        showSyncStatus('背景图片已上传并保存！');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    showSyncStatus('请选择一张图片文件！');
+                }
+            });
+            
+            // 恢复默认背景
+            resetBackground.addEventListener('click', function() {
+                localStorage.removeItem('customBackground');
+                document.body.style.backgroundImage = '';
+                document.body.style.background = 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)';
+                showSyncStatus('已恢复默认背景！');
+            });
+            
+            // 全局设置管理
+            const siteTitle = document.getElementById('siteTitle');
+            const siteDescription = document.getElementById('siteDescription');
+            const saveGlobalSettings = document.getElementById('saveGlobalSettings');
+            
+            function initGlobalSettings() {
+                // 加载网站标题
+                const savedTitle = localStorage.getItem('siteTitle');
+                if (savedTitle) {
+                    document.title = savedTitle;
+                    siteTitle.value = savedTitle;
+                    document.querySelector('.title-site').textContent = savedTitle;
+                }
+                
+                // 加载网站描述
+                const savedDescription = localStorage.getItem('siteDescription');
+                if (savedDescription) {
+                    siteDescription.value = savedDescription;
+                    document.querySelector('.subtitle').textContent = savedDescription;
+                }
+                
+                // 加载背景图片
+                const savedBg = localStorage.getItem('customBackground');
+                if (savedBg) {
+                    document.body.style.backgroundImage = `url(${savedBg})`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundAttachment = 'fixed';
+                }
+            }
+            
+            // 保存全局设置
+            saveGlobalSettings.addEventListener('click', function() {
+                const title = siteTitle.value.trim();
+                const description = siteDescription.value.trim();
+                
+                if (title) {
+                    localStorage.setItem('siteTitle', title);
+                    document.title = title;
+                    document.querySelector('.title-site').textContent = title;
+                }
+                
+                if (description) {
+                    localStorage.setItem('siteDescription', description);
+                    document.querySelector('.subtitle').textContent = description;
+                }
+                
+                showSyncStatus('全局设置已保存！');
+            });
+        });
     </script>
 </body>
 </html>
